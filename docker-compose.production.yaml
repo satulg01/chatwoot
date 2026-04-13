@@ -46,9 +46,9 @@ services:
       - postgres_data:/var/lib/postgresql/data
     environment:
       - POSTGRES_DB=chatwoot
-      - POSTGRES_USER=postgres
+      - POSTGRES_USER=admin
       # Please provide your own password.
-      - POSTGRES_PASSWORD=
+      - POSTGRES_PASSWORD=e2JQ4z1i7D8j
 
   redis:
     image: redis:alpine
