@@ -1,0 +1,42 @@
+## Mudança em Ruby/migrations (maioria dos casos)
+git pull
+docker compose -f docker-compose.production.yaml restart
+docker compose -f docker-compose.production.yaml run --rm rails bundle exec rails db:migrate
+
+## Mudança em Vue/JS/CSS ou Gemfile (menos frequente)
+git pull
+docker compose -f docker-compose.production.yaml up -d --build
+docker compose -f docker-compose.production.yaml run --rm rails bundle exec rails db:migrate
+
+
+--[Criar primeiro super admin]
+docker compose -f docker-compose.production.yaml run --rm rails bundle exec rails runner "SuperAdmin.create!(name: 'Admin', email: 'leap.dev.eng@gmail.com', password: '{^o4tCEyKbRq5L57~')"
+
+--[Criar primeiro user]
+docker compose -f docker-compose.production.yaml run --rm rails bundle exec rails runner "
+account = Account.create!(name: 'Minha Empresa');
+user = User.create!(name: 'Admin', email: 'leap.dev.eng@gmail.com', password: '{^o4tCEyKbRq5L57~', type: 'User');
+AccountUser.create!(account: account, user: user, role: 'administrator')
+"
+
+--[Confirmar primeiro user]
+docker compose -f docker-compose.production.yaml run --rm rails bundle exec rails runner "User.find_by(email: 'leap.dev.eng@gmail.com').confirm"
+
+--[Criar conta e vincular user]
+docker compose -f docker-compose.production.yaml run --rm rails bundle exec rails runner "
+account = Account.create!(name: 'Minha Empresa');
+user = User.find_by(email: 'leap.dev.eng@gmail.com');
+AccountUser.create!(account: account, user: user, role: 'administrator')
+"
+--[Confirmar SuperAdmin]
+docker compose -f docker-compose.production.yaml run --rm rails bundle exec rails runner "SuperAdmin.find_by(email: 'leap.dev.eng@gmail.com').confirm"
+
+
+--[VER LOGS]
+docker compose -f docker-compose.production.yaml logs rails --tail=50
+
+--[LIMPAR RATE LIMIT]
+docker compose -f docker-compose.production.yaml run --rm rails bundle exec rails runner "Rack::Attack.cache.store.clear"
+
+-- [REINICIAR REDIS]
+docker compose -f docker-compose.production.yaml restart redis
